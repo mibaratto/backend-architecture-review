@@ -8,6 +8,20 @@ CREATE TABLE users (
     created_at TEXT DEFAULT (DATETIME()) NOT NULL
 );
 
+CREATE TABLE playlists (
+    id TEXT PRIMARY KEY UNIQUE NOT NULL,
+    creator_id TEXT UNIQUE NOT NULL,
+    name TEXT NOT NULL,
+    likes INTEGER DEFAULT(0) NOT NULL,
+    dislikes INTEGER DEFAULT(0) NOT NULL,
+    created_at TEXT DEFAULT (DATETIME()) NOT NULL,
+    updated_at TEXT DEFAULT (DATETIME()) NOT NULL,
+    FOREIGN KEY (creator_id) REFERENCES users (id)
+      ON UPDATE CASCADE
+      ON DELETE CASCADE
+);
+
+
 INSERT INTO users (id, name, email, password, role)
 VALUES
   -- tipo NORMAL e senha = fulano123
@@ -20,4 +34,14 @@ VALUES
 	('u003', 'Astrodev', 'astrodev@email.com', '$2a$12$lHyD.hKs3JDGu2nIbBrxYujrnfIX5RW5oq/B41HCKf7TSaq9RgqJ.', 'ADMIN');
 
 
-    SELECT * FROM users; 
+INSERT INTO playlists (id, creator_id, name)
+  VALUES 
+    ('p001','u001', 'Rock'),
+    ('p002','u002', 'Clássico');
+
+
+SELECT * FROM users; 
+
+SELECT * FROM playlists; 
+
+DROP TABLE playlists;
