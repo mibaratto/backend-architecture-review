@@ -96,7 +96,7 @@ export class User {
     }
     
     public toBusinessModel(): UserModel {
-    return {
+      return {
         id: this.id,
         name: this.name,
         email: this.email,
@@ -105,6 +105,3 @@ export class User {
         }
     }
 }
-
-
-
