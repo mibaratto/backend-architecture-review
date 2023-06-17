@@ -21,6 +21,18 @@ CREATE TABLE playlists (
       ON DELETE CASCADE
 );
 
+CREATE TABLE likes_dislikes (
+  user_id TEXT NOT NULL,
+  playlists_id TEXT NOT NULL,
+  like INTEGER NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users (id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE,
+  FOREIGN KEY (playlists_id) REFERENCES playlists (id)
+    ON UPDATE CASCADE
+    ON DELETE CASCADE
+);
+
 
 INSERT INTO users (id, name, email, password, role)
 VALUES
@@ -40,8 +52,34 @@ INSERT INTO playlists (id, creator_id, name)
     ('p002','u002', 'Clássico');
 
 
+INSERT INTO likes_dislikes (user_id, playlists_id, like)
+  VALUES
+  ('u002','p001','1'),
+  ('u003','p001','1'),
+  ('u001','p002','1'),
+  ('u003','p002','0');
+
+
 SELECT * FROM users; 
 
 SELECT * FROM playlists; 
 
+SELECT * FROM likes_dislikes; 
+
+UPDATE playlists
+SET likes = 2, dislikes = 0
+WHERE id = 'p001';
+
+UPDATE playlists
+SET likes = 1, dislikes = 1
+WHERE id = 'p002';
+
+
+
+
+-- tables need be deleted in that order
+DROP TABLE likes_dislikes;
+
 DROP TABLE playlists;
+
+DROP TABLE users;
