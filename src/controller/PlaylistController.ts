@@ -63,7 +63,7 @@ export class PlaylistController {
                 name: req.body.name,
                 idToEdit: req.params.id
             })
-            const output = await this.playlistBusiness.editPlaylists(input)
+            const output = await this.playlistBusiness.editPlaylist(input)
             res.status(200).send(output)
             
         } catch (error) {

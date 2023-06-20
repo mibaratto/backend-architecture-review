@@ -6,6 +6,9 @@ import { Playlist } from "../models/Playlist";
 import { IdGenerator } from "../services/IdGenerator";
 import { TokenManager } from "../services/TokenManager";
 import { GetPlaylistsInputDTO, GetPlaylistsOutputDTO } from "../dtos/playlist/getPlaylists.dto";
+import { EditPlaylistInputDTO, EditPlaylistOutputDTO } from "../dtos/playlist/editPlaylist.dto";
+import { NotFoundError } from "../errors/NotFoundError";
+import { ForbiddenError } from "../errors/ForbiddenError";
 
 export class PlaylistBusiness {
     constructor(
@@ -13,6 +16,7 @@ export class PlaylistBusiness {
         private idGenerator: IdGenerator,
         private tokenManager: TokenManager
     ){}
+    
     public createPlaylist = async (
         input: CreatePlaylistInputDTO
     ): Promise<CreatePlaylistOutputDTO> => {
@@ -77,4 +81,45 @@ export class PlaylistBusiness {
     
         return output
       }
+
+      public editPlaylist = async (
+        input: EditPlaylistInputDTO
+    ): Promise<EditPlaylistOutputDTO> => {
+        const { name, token, idToEdit} = input
+
+        const payload = this.tokenManager.getPayload(token)
+
+        if(!payload) {
+            throw new UnauthorizedError()
+        }
+
+        const playlistDB = await this.playlistDatabase.findPlaylistById(idToEdit)
+
+        if(!playlistDB) {
+            throw new NotFoundError("playlist with this id not found")
+        }
+
+        if (payload.id !== playlistDB.creator_id) {
+            throw new ForbiddenError("only the creator of the playlist can edit it")
+        }
+
+        const playlist = new Playlist(
+            playlistDB.id,
+            playlistDB.name,
+            playlistDB.likes,
+            playlistDB.dislikes,
+            playlistDB.created_at,
+            playlistDB.updated_at,
+            playlistDB.creator_id,
+            payload.name
+        )
+
+        playlist.setName(name)
+
+        const updatedPlaylistDB = playlist.toDBModel()
+        await this.playlistDatabase.updatePlaylist(updatedPlaylistDB)
+
+        const output: EditPlaylistOutputDTO = undefined
+        return output
+    }
 }
