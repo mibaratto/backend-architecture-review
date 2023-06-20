@@ -17,7 +17,7 @@ const playlistController = new PlaylistController(
 
 playlistRouter.post("/", playlistController.createPlaylist)
 playlistRouter.get("/", playlistController.getPlaylists)
-//playlistRouter.put("/:id", playlistController.editPlaylist)
+playlistRouter.put("/:id", playlistController.editPlaylist)
 //playlistRouter.delete("/:id", playlistController.deletePlaylist)
 
 //playlistRouter.put("/:id/like", playlistController.likeOrDislikePlaylist)
