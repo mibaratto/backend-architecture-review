@@ -8,6 +8,17 @@ export interface PlaylistDB {
     updated_at: string
 }
 
+export interface PlaylistDBWithCreatorName {
+    id: string,
+    creator_id: string,
+    name: string,
+    likes: number,
+    dislikes: number,
+    created_at: string,
+    updated_at: string,
+    creator_name: string
+  }
+
 export interface PlaylistModel {
     id: string,
     name: string,
