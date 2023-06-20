@@ -9,6 +9,9 @@ import { GetPlaylistsInputDTO, GetPlaylistsOutputDTO } from "../dtos/playlist/ge
 import { EditPlaylistInputDTO, EditPlaylistOutputDTO } from "../dtos/playlist/editPlaylist.dto";
 import { NotFoundError } from "../errors/NotFoundError";
 import { ForbiddenError } from "../errors/ForbiddenError";
+import { DeletePlaylistInputDTO, DeletePlaylistOutputDTO } from "../dtos/playlist/deletePLaylist.dto";
+import { USER_ROLES } from "../models/User";
+
 
 export class PlaylistBusiness {
     constructor(
@@ -47,6 +50,7 @@ export class PlaylistBusiness {
         return output
     }
 
+
     public getPlaylists = async (
         input: GetPlaylistsInputDTO
       ): Promise<GetPlaylistsOutputDTO> => {
@@ -81,6 +85,7 @@ export class PlaylistBusiness {
     
         return output
       }
+
 
       public editPlaylist = async (
         input: EditPlaylistInputDTO
@@ -120,6 +125,38 @@ export class PlaylistBusiness {
         await this.playlistDatabase.updatePlaylist(updatedPlaylistDB)
 
         const output: EditPlaylistOutputDTO = undefined
+        return output
+    }
+
+
+    public deletePlaylist = async (
+        input: DeletePlaylistInputDTO
+      ): Promise<DeletePlaylistOutputDTO> => {
+        const { token, idToDelete } = input
+    
+        const payload = this.tokenManager.getPayload(token)
+    
+        if (!payload) {
+          throw new UnauthorizedError()
+        }
+    
+        const playlistDB = await this.playlistDatabase
+          .findPlaylistById(idToDelete)
+    
+        if (!playlistDB) {
+          throw new NotFoundError("playlist with this id does not exist")
+        }
+    
+        if (payload.role !== USER_ROLES.ADMIN) {
+          if (payload.id !== playlistDB.creator_id) {
+            throw new ForbiddenError("only the creator of the playlist can edit it")
+          }
+        }
+    
+        await this.playlistDatabase.deletePlaylistById(idToDelete)
+    
+        const output: DeletePlaylistOutputDTO = undefined
+    
         return output
     }
 }
