@@ -36,5 +36,9 @@ export class PlaylistBusiness {
         )
         const playlistDB = playlist.toDBModel()
         await this.playlistDatabse.insertPlaylist(playlistDB)
+
+        const output: CreatePlaylistOutputDTO = undefined
+
+        return output
     }
 }

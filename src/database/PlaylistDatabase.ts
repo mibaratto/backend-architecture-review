@@ -10,6 +10,6 @@ export class PlaylistDatabase extends BaseDatabase{
     ): Promise<void> => {
         await BaseDatabase
         .connection(PlaylistDatabase.TABLE_PLAYLISTS)
-        .insert(playlistDB)
+        .insert(playlistDB)  
     }
 }
