@@ -43,7 +43,7 @@ export class PlaylistBusiness {
         return output
     }
 
-    public getPLaylists = async (
+    public getPlaylists = async (
         input: GetPlaylistsInputDTO
     ): Promise<GetPlaylistsOutputDTO> => {
         const { token } = input
@@ -55,7 +55,7 @@ export class PlaylistBusiness {
         }
 
         const playlistsDB = await this.playlistDatabse.getPlaylists()
-        
+
 
     }
 }
