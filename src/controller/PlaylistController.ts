@@ -5,6 +5,7 @@ import { BaseError } from "../errors/BaseError";
 import { CreatePlaylistSchema } from "../dtos/playlist/createPlaylist.dto";
 import { GetPlaylistsSchema } from "../dtos/playlist/getPlaylists.dto";
 import { EditPlaylistSchema } from "../dtos/playlist/editPlaylist.dto";
+import { DeletePlaylistSchema } from "../dtos/playlist/deletePLaylist.dto";
 
 export class PlaylistController {
     constructor(
@@ -76,6 +77,30 @@ export class PlaylistController {
             } else {
                 res.status(500).send("unexpected error")
             }
+        }
+    }
+
+    public deletePlaylist = async (req: Request, res: Response) => {
+        try {
+          const input = DeletePlaylistSchema.parse({
+            token: req.headers.authorization,
+            idToDelete: req.params.id
+          })
+    
+          const output = await this.playlistBusiness.deletePlaylist(input)
+    
+          res.status(200).send(output)
+          
+        } catch (error) {
+          console.log(error)
+    
+          if (error instanceof ZodError) {
+            res.status(400).send(error.issues)
+          } else if (error instanceof BaseError) {
+            res.status(error.statusCode).send(error.message)
+          } else {
+            res.status(500).send("unexpected error")
+          }
         }
     }
 }
