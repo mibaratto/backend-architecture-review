@@ -39,7 +39,7 @@ export class PlaylistController {
             const input = GetPlaylistsSchema.parse({
                 token: req.headers.authorization
             })
-            const output = await this.playlistBusiness.getPlaylist(input)
+            const output = await this.playlistBusiness.getPlaylists(input)
             res.status(200).send(output)
             
         } catch (error) {

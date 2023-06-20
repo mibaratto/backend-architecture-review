@@ -1,15 +1,15 @@
-import { createBrotliDecompress } from "zlib";
+
 import { PlaylistDatabase } from "../database/PlaylistDatabase";
 import { CreatePlaylistInputDTO, CreatePlaylistOutputDTO } from "../dtos/playlist/createPlaylist.dto";
 import { UnauthorizedError } from "../errors/UnauthorizedError";
 import { Playlist } from "../models/Playlist";
 import { IdGenerator } from "../services/IdGenerator";
 import { TokenManager } from "../services/TokenManager";
-import { GetPlaylistsInputDTO, GetPlaylistsOutDTO, GetPlaylistsOutputDTO } from "../dtos/playlist/getPlaylists.dto";
+import { GetPlaylistsInputDTO, GetPlaylistsOutputDTO } from "../dtos/playlist/getPlaylists.dto";
 
 export class PlaylistBusiness {
     constructor(
-        private playlistDatabse: PlaylistDatabase,
+        private playlistDatabase: PlaylistDatabase,
         private idGenerator: IdGenerator,
         private tokenManager: TokenManager
     ){}
@@ -18,9 +18,9 @@ export class PlaylistBusiness {
     ): Promise<CreatePlaylistOutputDTO> => {
         const { name, token} = input
 
-        const playload = this.tokenManager.getPayload(token)
+        const payload = this.tokenManager.getPayload(token)
 
-        if(!playload) {
+        if(!payload) {
             throw new UnauthorizedError()
         }
 
@@ -32,11 +32,11 @@ export class PlaylistBusiness {
             0,
             new Date().toISOString(),
             new Date().toISOString(),
-            playload.id,
-            playload.name
+            payload.id,
+            payload.name
         )
         const playlistDB = playlist.toDBModel()
-        await this.playlistDatabse.insertPlaylist(playlistDB)
+        await this.playlistDatabase.insertPlaylist(playlistDB)
 
         const output: CreatePlaylistOutputDTO = undefined
 
@@ -45,17 +45,36 @@ export class PlaylistBusiness {
 
     public getPlaylists = async (
         input: GetPlaylistsInputDTO
-    ): Promise<GetPlaylistsOutputDTO> => {
+      ): Promise<GetPlaylistsOutputDTO> => {
         const { token } = input
-        
-        const playload = this.tokenManager.getPayload(token)
-
-        if(!playload) {
-            throw new UnauthorizedError()
+    
+        const payload = this.tokenManager.getPayload(token)
+    
+        if (!payload) {
+          throw new UnauthorizedError()
         }
-
-        const playlistsDB = await this.playlistDatabse.getPlaylists()
-
-
-    }
+    
+        const playlistsDBwithCreatorName =
+          await this.playlistDatabase.getPlaylistsWithCreatorName()
+        
+        const playlists = playlistsDBwithCreatorName
+          .map((playlistWithCreatorName) => {
+            const playlist = new Playlist(
+              playlistWithCreatorName.id,
+              playlistWithCreatorName.name,
+              playlistWithCreatorName.likes,
+              playlistWithCreatorName.dislikes,
+              playlistWithCreatorName.created_at,
+              playlistWithCreatorName.updated_at,
+              playlistWithCreatorName.creator_id,
+              playlistWithCreatorName.creator_name
+            )
+    
+            return playlist.toBusinessModel()
+        })
+    
+        const output: GetPlaylistsOutputDTO = playlists
+    
+        return output
+      }
 }
