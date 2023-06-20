@@ -5,6 +5,7 @@ import { UnauthorizedError } from "../errors/UnauthorizedError";
 import { Playlist } from "../models/Playlist";
 import { IdGenerator } from "../services/IdGenerator";
 import { TokenManager } from "../services/TokenManager";
+import { GetPlaylistsInputDTO, GetPlaylistsOutDTO, GetPlaylistsOutputDTO } from "../dtos/playlist/getPlaylists.dto";
 
 export class PlaylistBusiness {
     constructor(
@@ -40,5 +41,21 @@ export class PlaylistBusiness {
         const output: CreatePlaylistOutputDTO = undefined
 
         return output
+    }
+
+    public getPLaylists = async (
+        input: GetPlaylistsInputDTO
+    ): Promise<GetPlaylistsOutputDTO> => {
+        const { token } = input
+        
+        const playload = this.tokenManager.getPayload(token)
+
+        if(!playload) {
+            throw new UnauthorizedError()
+        }
+
+        const playlistsDB = await this.playlistDatabse.getPlaylists()
+        
+
     }
 }

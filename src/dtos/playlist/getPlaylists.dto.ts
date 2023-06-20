@@ -5,7 +5,7 @@ export interface GetPlaylistsInputDTO{
     token: string
 }
 
-export type GetPlaylistsOutDTO = PlaylistModel[]
+export type GetPlaylistsOutputDTO = PlaylistModel[]
 
 export const GetPlaylistsSchema = z.object({
     token: z.string().min(1)
